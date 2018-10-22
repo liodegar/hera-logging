@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>Hera Logging Framework</TITLE>
+  </head>
+
+  <BODY>
+
+    <h1>Hera Logging Framework</h1>
+    <h2>Abstract</h2>
+
+    <P>Hera Logging Framework is a reliable and flexible enterprise logging API for Java, that wraps the
+    functionality provided for any logging framework.
+    The default underlying logging mechanism is log4J 1.2.8<BR>
+    This implementation use the decorator or wrapper design pattern in order to provide a common alternative to subclassing
+    to attach new responsibilities to objects. Wrappers can save the day when extension by sub-classing
+    is impractical, which happens to be the case for the Log4J Logger class.</P>
+
+<h2>Grades</h2>
+
+    <P>The levels or grades to prioritize the log messages, are defined in the  <code>ve.com.cantv.util.Grade</code> class:</P>
+
+<UL>
+  <LI><PRE>FATAL: designates very severe error events that will presumably lead the application to abort.
+ </PRE></li>
+
+ <LI><PRE>ERROR: designates error events that  might still allow the application to continue running.
+ </PRE></li>
+
+ <LI><PRE>WARN: designates potentially harmful situations
+ </PRE></li>
+
+ <LI><PRE>INFO: designates informational messages that highlight the progress of the application at coarse-grained grade.
+ </PRE></li>
+
+ <LI><PRE>DEBUG: designates fine-grained  informational events that are most useful to debug an application.
+ </PRE></li>
+
+</UL>
+
+ <P>The first and foremost advantage of any logging API over plain <code>System.
+out.println</code> statements resides in its ability to disable certain log statements
+while allowing others to print unhindered without the need to re-compile, its only a matter of configuration.<br>
+<strong>Important:</strong> Never use <code>System.out.println</code> in your Java code.
+</P>
+
+<h2>Diagram class</h2>
+    <P>A picture is worth a thousand words: </P>
+
+    <P align=center><IMG  height="80%" alt="Hera Logging Framework Diagram class"
+      src="doc-files/HeraLoggerDiagramClass.jpg"
+      width="80%">
+    </P>
+
+<H2>Requirements</H2>
+
+    <P>Hera Logging Framework requires Log4j 1.2 or later.</P>
+
+
+    <H2>Using Hera Logging Framework</H2>
+
+    <H3>Setup</H3>
+    <P>You need to include the <code>log4j.jar and cantv-logging.jar</code> in the classpath.
+
+    <H3>Usage</H3>
+
+    <P>In order to retrieve a HeraLogger object, you only must declare one of the following forms in your Java code:</P>
+
+<PRE>
+/**
+ * This is the conventional way to retrieve a logger for this class
+ */
+ public static final HeraLogger LOGGER = HeraLogger.getLogger(Test.class);
+
+
+/**
+ * This way use the class' name to retrieve a logger for this class
+ */
+public static final HeraLogger LOGGER = HeraLogger.getLogger(Test.class.getName());
+
+<strong>A simple hello world program:</strong>
+
+public class HelloWorld {
+public static final HeraLogger LOGGER = HeraLogger.getLogger(HelloWorld.class);
+    public static void main(String[] args) {
+        LOGGER.debug("Hello world.");
+    }
+}
+</PRE>
+
+
+    <H2>Installing Log4J</H2>
+     <P>The latest version of log4j can be downloaded from
+    <A href="http://jakarta.apache.org/log4j/docs/download.html"><CODE>http://jakarta.apache.org/log4j/docs/download.html</CODE></a>
+    Releases are available in two formats: zip and tar.gz. After unpacking the distribution,
+    you should see the file LOG4J_HOME/dist/lib/log4j-VERSION.jar where
+    LOG4J_HOME is the directory where you unpacked the log4j distribution and VERSION
+    is the version of the log4j distribution you downloaded. To start using log4j
+    simply add this jar file to your CLASSPATH. </P>
+
+    <H2>Configuring Log4J</H2>
+
+    <P>The <CODE>log4j.properties</CODE> file is the configuration file of log4J.
+    If you wish do any customization, you will need to modify this file and add this file to your CLASSPATH.
+    </P>
+
+    <PRE>
+# Set root logger level to DEBUG and add an appender called XML.
+log4j.rootLogger=DEBUG, XML
+
+# XML is set to be a RollingFileAppender.
+log4j.appender.XML=org.apache.log4j.RollingFileAppender
+
+log4j.appender.XML.File=c:\\cantv\\classes\\logEvents.log
+log4j.appender.XML.MaxBackupIndex=5
+log4j.appender.XML.MaxFileSize=5MB
+
+# XML uses PatternLayout.
+log4j.appender.XML.layout=ve.com.cantv.sgcc.util.logging.HeraXMLLayout
+log4j.appender.XML.layout.LocationInfo=true
+    </PRE>
+
+
+    <H2>Output fotmat file</H2>
+    The default output of HeraLogger consists of a series of event elements. It does not output a complete well-formed XML file. The output is designed to be
+   included as an <em>external entity</em> in a separate file to form  a correct XML file.
+    <p>For example, if <code>abc</code> is the name of the file where
+   the HeraLogger ouput goes, then a well-formed XML file would be:
+
+   <pre>
+    &lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+    &lt;!DOCTYPE eventSet [&lt;!ENTITY data SYSTEM "logEvents.log"&gt;]&gt;
+
+    &lt;eventSet version="1.2" &gt;
+    &nbsp;&nbsp;&data;
+    &lt;/eventSet&gt;
+   </pre>
+
+   <br>The similar way, if you wish change the format date of the logging messages, you must modify the <code>cantv.properties</code>
+   putting a valid pattern in the <code>loggingFormatDate</code> key.
+
+   <H2>Extending the Hera logging framework</H2>
+
+   Remember that Hera logging framework has a flexible and extensible architecture. If you wish use another underlying logger, you
+   simply must create a new class with a public constructor that takes one String param representating the logger's name, and you must implement the <code>ve.com.cantv.util.loggingUniversalLogger</code> interface.
+   <br>Furthemore, add in the <code>cantv.properties</code> file the following key: <code>loggingClass</code> with the full qualified class name of the new class.
+
+   <br>Example code:
+
+   <pre>
+   <code>
+   public class Jdk14Logger implements UniversalLogger {
+
+        /**
+         * Wrapper of Java logging API Logger object
+         */
+        private java.util.logging.Logger logger;
+
+
+
+        /**
+         * Creates a new Jdk14Logger object
+         * @param name the logger's name
+         */
+        public Jdk14Logger(String name) {
+            this.logger = java.util.logging.Logger.getLogger(name);
+        }
+
+        //The rest of code is omitted by clarity
+
+    }
+   </code>
+
+Example of <code>cantv.properties</code> file configuration:
+   <code>
+   loggingClass=ve.com.cantv.sgcc.util.logging.Jdk14Logger
+   loggingFormatDate=yyyy-MM-dd HH:mm:ss.SSS
+   </code>
+
+   <strong>Important:</strong> If you wish use Log4J like default underlying logging mechanism, you must remove
+   <code>loggingClass</code> key from <code>cantv.properties</code> file configuration. In order to use the functionality
+   provided by the <code>cantv.properties</code> file configuration simply add this file to your CLASSPATH.
+
+   </pre>
+
+<h2>Running the Example</h2>
+<P>The binary file for the example are available under the CANTV_LOGGING_HOME/ directory,
+where CANTV_LOGGING_HOME is the directory where you unpacked cantv-logging.jar. In order to execute the examples,
+you must have the log4j-VERSION.jar as well as the CANTV_LOGGING_HOME/ directory in your CLASSPATH.
+
+The command line usage is:
+</P>
+    <PRE>
+java test.Test log4JFilePath
+
+where log4JFilePath is the full path of Log4J file configuration (log4j.properties)
+    </PRE>
+
+   <h2>Comments and Questions</h2>
+   <p> Although I have tried my best, this summary undoubtedly contains omissions, inaccuracies
+and mistakes. You can help me improve it by sending your suggestions or questions to:
+<pre>
+***************************************
+*    email: lbraca@cantv.com.ve       *
+*    Phone office: 58-212-500.05.02   *
+*    Liodegar Bracamonte              *
+*    IT Planning Consultant           *
+***************************************
+</pre>
+</p>
+
+  </body>
+</html>
