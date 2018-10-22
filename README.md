@@ -108,7 +108,6 @@ Example of *hera-logging.properties* file configuration:
 
 ## Built With
 
-*
 * [Maven](https://maven.apache.org/) - Dependency Management
 
 
@@ -122,7 +121,7 @@ and mistakes. You can help me improve it by sending your suggestions or question
 
 ## License
 
-No license required.
+Apache License 2.0.
 
 ## Acknowledgments
 
